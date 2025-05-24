@@ -4,9 +4,11 @@ from typing import Annotated, List
 from sqlalchemy.orm import Session
 from pydantic import BaseModel
 from database import SessionLocal, engine
+from routers import auth_router
 import models
 
 app = FastAPI()
+app.include_router(auth_router.router)
 
 origins = [
     "http://localhost:5173",
@@ -30,3 +32,4 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 models.Base.metadata.create_all(bind=engine)
+

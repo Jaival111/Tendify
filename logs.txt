@@ -1,0 +1,3 @@
+Tried to implement authentication.
+Made auth.py and auth_router.py.
+nothing else.
