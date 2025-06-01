@@ -32,6 +32,7 @@ class SubjectCreate(SubjectBase):
 
 class Subject(SubjectBase):
     id: int
+    user_id: int
 
     class Config:
         from_attributes = True
@@ -52,6 +53,7 @@ class Attendance(AttendanceBase):
 
 class SubjectWithAttendance(Subject):
     attendances: List[Attendance]
+    user_id: int
 
 class AttendanceStats(BaseModel):
     total_classes: int

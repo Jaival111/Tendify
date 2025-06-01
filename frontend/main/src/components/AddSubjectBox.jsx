@@ -6,6 +6,7 @@ import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
 import { useState } from 'react';
+import { fetchWithAuth } from '../utils/api';
 
 function AddSubjectBox({ onSubjectAdded }) {
     const [showModal, setShowModal] = useState(false);
@@ -28,20 +29,11 @@ function AddSubjectBox({ onSubjectAdded }) {
         setLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8000/api/subjects', {
+            const newSubject = await fetchWithAuth('/api/subjects', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({ name: subjectName }),
             });
-            
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to add subject');
-            }
 
-            const newSubject = await response.json();
             if (newSubject && newSubject.id) {
                 onSubjectAdded(newSubject);
                 setShowModal(false);

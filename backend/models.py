@@ -10,6 +10,7 @@ class User(Base):
     name = Column(String, index=True)
     email = Column(String, unique=True, index=True)
     password = Column(String)
+    subjects = relationship("Subject", back_populates="user")
 
 class AttendanceStatus(str, enum.Enum):
     ATTENDED = "attended"
@@ -19,7 +20,9 @@ class Subject(Base):
     __tablename__ = "subjects"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
+    user_id = Column(Integer, ForeignKey("user.id"))
+    user = relationship("User", back_populates="subjects")
     attendances = relationship("Attendance", back_populates="subject")
 
 class Attendance(Base):

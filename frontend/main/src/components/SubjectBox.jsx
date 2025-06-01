@@ -8,6 +8,7 @@ import Button from 'react-bootstrap/Button';
 import { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
+import { fetchWithAuth } from '../utils/api';
 
 function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
     const [attendanceData, setAttendanceData] = useState({
@@ -32,11 +33,7 @@ function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
         if (!subject?.id) return;
         
         try {
-            const response = await fetch(`http://localhost:8000/api/subjects/${subject.id}/attendance`);
-            if (!response.ok) {
-                throw new Error('Failed to fetch attendance data');
-            }
-            const data = await response.json();
+            const data = await fetchWithAuth(`/api/subjects/${subject.id}/attendance`);
             setAttendanceData(data);
             setError(null);
         } catch (error) {
@@ -56,22 +53,14 @@ function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
     const handleAttendance = async (status) => {
         try {
             setUpdatingStatus(status);
-            const response = await fetch(`http://localhost:8000/api/subjects/${subject.id}/attendance`, {
+            await fetchWithAuth(`/api/subjects/${subject.id}/attendance`, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
                 body: JSON.stringify({
                     status: status,
                     date: new Date().toISOString().split('T')[0],
                     subject_id: subject.id
                 }),
             });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.detail || 'Failed to update attendance');
-            }
 
             await fetchAttendanceData();
             if (onAttendanceUpdate) {
@@ -91,13 +80,9 @@ function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
         }
 
         try {
-            const response = await fetch(`http://localhost:8000/api/subjects/${subject.id}`, {
+            await fetchWithAuth(`/api/subjects/${subject.id}`, {
                 method: 'DELETE',
             });
-
-            if (!response.ok) {
-                throw new Error('Failed to delete subject');
-            }
 
             if (onSubjectDeleted) {
                 onSubjectDeleted(subject.id);

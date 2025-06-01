@@ -2,6 +2,7 @@ import { useAuth } from '../context/AuthContext';
 import { useState, useEffect } from 'react';
 import AddSubjectBox from '../components/AddSubjectBox';
 import SubjectBox from '../components/SubjectBox';
+import { fetchWithAuth } from '../utils/api';
 
 function HomePage() {
   const { user } = useAuth();
@@ -18,11 +19,7 @@ function HomePage() {
   const fetchSubjects = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:8000/api/subjects');
-      if (!response.ok) {
-        throw new Error('Failed to fetch subjects');
-      }
-      const data = await response.json();
+      const data = await fetchWithAuth('/api/subjects');
       setSubjects(data);
       setError(null);
     } catch (error) {

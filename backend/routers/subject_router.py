@@ -4,6 +4,7 @@ from typing import List, Annotated
 import models
 import schemas
 import database
+from routers.auth_router import get_current_user
 
 router = APIRouter(
     prefix="/api/subjects",
@@ -20,8 +21,15 @@ def get_db():
 db_dependency = Annotated[Session, Depends(get_db)]
 
 @router.post("/", response_model=schemas.Subject)
-def create_subject(subject: schemas.SubjectCreate, db: Session = Depends(get_db)):
-    db_subject = models.Subject(name=subject.name)
+def create_subject(
+    subject: schemas.SubjectCreate, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    db_subject = models.Subject(
+        name=subject.name,
+        user_id=current_user.id
+    )
     db.add(db_subject)
     try:
         db.commit()
@@ -29,15 +37,25 @@ def create_subject(subject: schemas.SubjectCreate, db: Session = Depends(get_db)
         return db_subject
     except Exception as e:
         db.rollback()
-        raise HTTPException(status_code=400, detail="Subject with this name already exists")
+        raise HTTPException(status_code=400, detail="Subject with this name already exists for this user")
 
 @router.get("/", response_model=List[schemas.Subject])
-def get_subjects(db: Session = Depends(get_db)):
-    return db.query(models.Subject).all()
+def get_subjects(
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    return db.query(models.Subject).filter(models.Subject.user_id == current_user.id).all()
 
 @router.delete("/{subject_id}")
-def delete_subject(subject_id: int, db: Session = Depends(get_db)):
-    subject = db.query(models.Subject).filter(models.Subject.id == subject_id).first()
+def delete_subject(
+    subject_id: int, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    subject = db.query(models.Subject).filter(
+        models.Subject.id == subject_id,
+        models.Subject.user_id == current_user.id
+    ).first()
     if not subject:
         raise HTTPException(status_code=404, detail="Subject not found")
     
@@ -50,8 +68,15 @@ def delete_subject(subject_id: int, db: Session = Depends(get_db)):
     return {"message": "Subject deleted successfully"}
 
 @router.get("/{subject_id}/attendance", response_model=schemas.AttendanceStats)
-def get_subject_attendance(subject_id: int, db: Session = Depends(get_db)):
-    subject = db.query(models.Subject).filter(models.Subject.id == subject_id).first()
+def get_subject_attendance(
+    subject_id: int, 
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    subject = db.query(models.Subject).filter(
+        models.Subject.id == subject_id,
+        models.Subject.user_id == current_user.id
+    ).first()
     if not subject:
         raise HTTPException(status_code=404, detail="Subject not found")
 
@@ -75,9 +100,13 @@ def get_subject_attendance(subject_id: int, db: Session = Depends(get_db)):
 def create_or_update_attendance(
     subject_id: int,
     attendance: schemas.AttendanceCreate,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
 ):
-    subject = db.query(models.Subject).filter(models.Subject.id == subject_id).first()
+    subject = db.query(models.Subject).filter(
+        models.Subject.id == subject_id,
+        models.Subject.user_id == current_user.id
+    ).first()
     if not subject:
         raise HTTPException(status_code=404, detail="Subject not found")
 
