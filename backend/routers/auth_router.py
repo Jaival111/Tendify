@@ -14,6 +14,21 @@ def get_db():
         
 db_dependency = Annotated[Session, Depends(get_db)]
 
+async def get_current_user(token: str = Depends(auth.oauth2_scheme), db: Session = Depends(get_db)):
+    email = auth.decode_access_token(token)
+    if email is None:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+    
+    user = db.query(models.User).filter(models.User.email == email).first()
+    if user is None:
+        raise HTTPException(status_code=401, detail="User not found")
+    
+    return user
+
+@router.get("/me", response_model=schemas.UserResponse)
+async def read_users_me(current_user: models.User = Depends(get_current_user)):
+    return current_user
+
 @router.post("/signup", response_model=schemas.Token)
 def signup(user: schemas.UserCreate, db: db_dependency):
     if db.query(models.User).filter(models.User.email == user.email).first():

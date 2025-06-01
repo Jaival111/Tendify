@@ -11,7 +11,7 @@ app = FastAPI()
 app.include_router(auth_router.router)
 
 origins = [
-    "http://localhost:5173",
+    "http://localhost:3000",
 ]
 
 app.add_middleware(
