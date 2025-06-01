@@ -1,14 +1,14 @@
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
-from typing import Annotated, List
+from typing import Annotated
 from sqlalchemy.orm import Session
-from pydantic import BaseModel
 from database import SessionLocal, engine
-from routers import auth_router
+from routers import auth_router, subject_router
 import models
 
 app = FastAPI()
 app.include_router(auth_router.router)
+app.include_router(subject_router.router)
 
 origins = [
     "http://localhost:3000",

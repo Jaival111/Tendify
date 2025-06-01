@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from typing import Annotated
+from typing import Annotated, List
 import models, schemas, auth, database
 
 router = APIRouter()
@@ -24,6 +24,11 @@ async def get_current_user(token: str = Depends(auth.oauth2_scheme), db: Session
         raise HTTPException(status_code=401, detail="User not found")
     
     return user
+
+@router.get("/users", response_model=List[schemas.UserResponse])
+def list_users(db: db_dependency):
+    users = db.query(models.User).all()
+    return users
 
 @router.get("/me", response_model=schemas.UserResponse)
 async def read_users_me(current_user: models.User = Depends(get_current_user)):

@@ -1,5 +1,7 @@
 from database import Base
-from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy import Column, Integer, String, ForeignKey, Date, Enum
+from sqlalchemy.orm import relationship
+import enum
 
 class User(Base):
     __tablename__ = "user"
@@ -9,17 +11,22 @@ class User(Base):
     email = Column(String, unique=True, index=True)
     password = Column(String)
 
+class AttendanceStatus(str, enum.Enum):
+    ATTENDED = "attended"
+    MISSED = "missed"
+
 class Subject(Base):
-    __tablename__ = "subject"
+    __tablename__ = "subjects"
 
     id = Column(Integer, primary_key=True, index=True)
-    name = Column(String, index=True)
+    name = Column(String, unique=True, index=True)
+    attendances = relationship("Attendance", back_populates="subject")
 
 class Attendance(Base):
-    __tablename__ = "attendance"
+    __tablename__ = "attendances"
 
     id = Column(Integer, primary_key=True, index=True)
-    student_id = Column(Integer, ForeignKey("user.id"), index=True)
-    subject_id = Column(Integer, ForeignKey("subject.id"), index=True)
-    date = Column(String, index=True)
-    status = Column(String)  # Present or Absent
+    subject_id = Column(Integer, ForeignKey("subjects.id"))
+    date = Column(Date)
+    status = Column(Enum(AttendanceStatus))
+    subject = relationship("Subject", back_populates="attendances")

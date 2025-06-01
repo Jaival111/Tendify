@@ -1,4 +1,7 @@
 from pydantic import BaseModel, EmailStr
+from datetime import date
+from typing import List
+from models import AttendanceStatus
 
 class UserCreate(BaseModel):
     name: str
@@ -20,3 +23,38 @@ class UserResponse(BaseModel):
 
     class Config:
         from_attributes = True
+
+class SubjectBase(BaseModel):
+    name: str
+
+class SubjectCreate(SubjectBase):
+    pass
+
+class Subject(SubjectBase):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+class AttendanceBase(BaseModel):
+    date: date
+    status: AttendanceStatus
+
+class AttendanceCreate(AttendanceBase):
+    subject_id: int
+
+class Attendance(AttendanceBase):
+    id: int
+    subject_id: int
+
+    class Config:
+        from_attributes = True
+
+class SubjectWithAttendance(Subject):
+    attendances: List[Attendance]
+
+class AttendanceStats(BaseModel):
+    total_classes: int
+    attended_classes: int
+    missed_classes: int
+    attendance_percentage: float
