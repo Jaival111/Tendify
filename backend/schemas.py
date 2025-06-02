@@ -60,3 +60,6 @@ class AttendanceStats(BaseModel):
     attended_classes: int
     missed_classes: int
     attendance_percentage: float
+
+class AttendanceStatusResponse(BaseModel):
+    status: AttendanceStatus | None

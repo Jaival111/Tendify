@@ -5,6 +5,8 @@ import models
 import schemas
 import database
 from routers.auth_router import get_current_user
+from pydantic import BaseModel
+from datetime import date
 
 router = APIRouter(
     prefix="/api/subjects",
@@ -132,4 +134,55 @@ def create_or_update_attendance(
         db.add(db_attendance)
         db.commit()
         db.refresh(db_attendance)
-        return db_attendance 
+        return db_attendance
+
+@router.get("/{subject_id}/attendance/status", response_model=schemas.AttendanceStatusResponse)
+def get_attendance_status(
+    subject_id: int,
+    date: str,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    subject = db.query(models.Subject).filter(
+        models.Subject.id == subject_id,
+        models.Subject.user_id == current_user.id
+    ).first()
+    if not subject:
+        raise HTTPException(status_code=404, detail="Subject not found")
+
+    attendance = db.query(models.Attendance).filter(
+        models.Attendance.subject_id == subject_id,
+        models.Attendance.date == date
+    ).first()
+
+    return {"status": attendance.status if attendance else None}
+
+class AttendanceDelete(BaseModel):
+    date: date
+    subject_id: int
+
+@router.delete("/{subject_id}/attendance")
+def delete_attendance(
+    subject_id: int,
+    attendance: AttendanceDelete,
+    db: Session = Depends(get_db),
+    current_user: models.User = Depends(get_current_user)
+):
+    subject = db.query(models.Subject).filter(
+        models.Subject.id == subject_id,
+        models.Subject.user_id == current_user.id
+    ).first()
+    if not subject:
+        raise HTTPException(status_code=404, detail="Subject not found")
+
+    attendance_record = db.query(models.Attendance).filter(
+        models.Attendance.subject_id == subject_id,
+        models.Attendance.date == attendance.date
+    ).first()
+
+    if not attendance_record:
+        raise HTTPException(status_code=404, detail="Attendance record not found")
+
+    db.delete(attendance_record)
+    db.commit()
+    return {"message": "Attendance record deleted successfully"} 
