@@ -75,6 +75,7 @@ function SignupPage() {
     return (
         <Container className='mt-5 mb-5' style={containerStyle}>
             <h1 className='text-center'>Sign up!</h1>
+            <h4 className='text-center mb-5'>To track your class attendance</h4>
             {error && <div className="alert alert-danger">{error}</div>}
             <Form onSubmit={handleSubmit}>
                 <Form.Group className="mb-3" controlId="formBasicName">

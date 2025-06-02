@@ -1,7 +1,7 @@
 import Container from "react-bootstrap/esm/Container";
 import Card from 'react-bootstrap/Card';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faPlus } from '@fortawesome/free-solid-svg-icons';
+import { faCirclePlus } from '@fortawesome/free-solid-svg-icons';
 import Modal from 'react-bootstrap/Modal';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button';
@@ -17,8 +17,7 @@ function AddSubjectBox({ onSubjectAdded }) {
     const containerStyle = {
         maxWidth: '600px',
         margin: '0 auto',
-        padding: '20px',
-        backgroundColor: '#f8f9fa',
+        padding: '0',
         borderRadius: '5px',
         boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'
     };
@@ -54,11 +53,11 @@ function AddSubjectBox({ onSubjectAdded }) {
             <Container className='mt-5 mb-5' style={containerStyle}>
                 <Card 
                     className="text-center" 
-                    style={{ cursor: 'pointer', height: '200px' }}
+                    style={{ cursor: 'pointer', height: '100px' }}
                     onClick={() => setShowModal(true)}
                 >
                     <Card.Body className="d-flex align-items-center justify-content-center">
-                        <FontAwesomeIcon icon={faPlus} />
+                        <FontAwesomeIcon icon={faCirclePlus} size="2x"/>
                     </Card.Body>
                 </Card>
             </Container>

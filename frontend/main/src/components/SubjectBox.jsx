@@ -6,7 +6,7 @@ import Col from 'react-bootstrap/Col';
 import Card from 'react-bootstrap/Card';
 import Button from 'react-bootstrap/Button';
 import { useState, useEffect, useCallback } from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 import { fetchWithAuth } from '../utils/api';
 
@@ -19,12 +19,12 @@ function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
     });
     const [error, setError] = useState(null);
     const [updatingStatus, setUpdatingStatus] = useState(null);
+    const [currentDateAttendance, setCurrentDateAttendance] = useState(null);
 
     const containerStyle = {
         maxWidth: '600px',
         margin: '0 auto',
-        padding: '20px',
-        backgroundColor: '#f8f9fa',
+        padding: '0px',
         borderRadius: '5px',
         boxShadow: '0 0 10px rgba(0, 0, 0, 0.1)'
     }
@@ -35,6 +35,12 @@ function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
         try {
             const data = await fetchWithAuth(`/api/subjects/${subject.id}/attendance`);
             setAttendanceData(data);
+            
+            // Fetch current date's attendance status
+            const today = new Date().toISOString().split('T')[0];
+            const currentAttendance = await fetchWithAuth(`/api/subjects/${subject.id}/attendance/status?date=${today}`);
+            setCurrentDateAttendance(currentAttendance.status);
+            
             setError(null);
         } catch (error) {
             console.error('Error fetching attendance data:', error);
@@ -53,15 +59,18 @@ function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
     const handleAttendance = async (status) => {
         try {
             setUpdatingStatus(status);
+            const today = new Date().toISOString().split('T')[0];
+            
             await fetchWithAuth(`/api/subjects/${subject.id}/attendance`, {
                 method: 'POST',
                 body: JSON.stringify({
                     status: status,
-                    date: new Date().toISOString().split('T')[0],
+                    date: today,
                     subject_id: subject.id
                 }),
             });
 
+            setCurrentDateAttendance(status);
             await fetchAttendanceData();
             if (onAttendanceUpdate) {
                 onAttendanceUpdate();
@@ -69,6 +78,32 @@ function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
         } catch (error) {
             console.error('Error updating attendance:', error);
             setError(error.message || 'Failed to update attendance');
+        } finally {
+            setUpdatingStatus(null);
+        }
+    };
+
+    const handleRemoveAttendance = async () => {
+        try {
+            setUpdatingStatus('removing');
+            const today = new Date().toISOString().split('T')[0];
+            
+            await fetchWithAuth(`/api/subjects/${subject.id}/attendance`, {
+                method: 'DELETE',
+                body: JSON.stringify({
+                    date: today,
+                    subject_id: subject.id
+                }),
+            });
+
+            setCurrentDateAttendance(null);
+            await fetchAttendanceData();
+            if (onAttendanceUpdate) {
+                onAttendanceUpdate();
+            }
+        } catch (error) {
+            console.error('Error removing attendance:', error);
+            setError(error.message || 'Failed to remove attendance');
         } finally {
             setUpdatingStatus(null);
         }
@@ -146,26 +181,41 @@ function SubjectBox({ subject, onAttendanceUpdate, onSubjectDeleted }) {
                                 </Col>
                             </Row>
                             <Row className="mt-3">
-                                <Col xs={6}>
-                                    <Button 
-                                        variant={updatingStatus === 'attended' ? 'secondary' : 'success'}
-                                        className="w-100"
-                                        onClick={() => handleAttendance('attended')}
-                                        disabled={updatingStatus === 'attended'}
-                                    >
-                                        {updatingStatus === 'attended' ? 'Updating...' : 'Attended'}
-                                    </Button>
-                                </Col>
-                                <Col xs={6}>
-                                    <Button 
-                                        variant={updatingStatus === 'missed' ? 'secondary' : 'danger'}
-                                        className="w-100"
-                                        onClick={() => handleAttendance('missed')}
-                                        disabled={updatingStatus === 'missed'}
-                                    >
-                                        {updatingStatus === 'missed' ? 'Updating...' : 'Missed'}
-                                    </Button>
-                                </Col>
+                                {currentDateAttendance ? (
+                                    <Col xs={12}>
+                                        <Button 
+                                            variant="warning"
+                                            className="w-100"
+                                            onClick={handleRemoveAttendance}
+                                            disabled={updatingStatus === 'removing'}
+                                        >
+                                            {updatingStatus === 'removing' ? 'Removing...' : 'Remove Attendance'}
+                                        </Button>
+                                    </Col>
+                                ) : (
+                                    <>
+                                        <Col xs={6}>
+                                            <Button 
+                                                variant={updatingStatus === 'attended' ? 'secondary' : 'success'}
+                                                className="w-100"
+                                                onClick={() => handleAttendance('attended')}
+                                                disabled={updatingStatus === 'attended'}
+                                            >
+                                                {updatingStatus === 'attended' ? 'Updating...' : 'Attended'}
+                                            </Button>
+                                        </Col>
+                                        <Col xs={6}>
+                                            <Button 
+                                                variant={updatingStatus === 'missed' ? 'secondary' : 'danger'}
+                                                className="w-100"
+                                                onClick={() => handleAttendance('missed')}
+                                                disabled={updatingStatus === 'missed'}
+                                            >
+                                                {updatingStatus === 'missed' ? 'Updating...' : 'Missed'}
+                                            </Button>
+                                        </Col>
+                                    </>
+                                )}
                             </Row>
                         </Col>
                     </Row>

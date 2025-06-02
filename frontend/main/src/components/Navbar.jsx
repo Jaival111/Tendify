@@ -39,7 +39,7 @@ function NavComponent() {
     return (
         <Navbar expand="lg" className="bg-body-tertiary" data-bs-theme="dark">
             <Container>
-                <Navbar.Brand href="/">Attendance Manager</Navbar.Brand>
+                <Navbar.Brand href="/">Tendify</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse id="basic-navbar-nav">
                     <Nav className="me-auto">
@@ -62,7 +62,12 @@ function NavComponent() {
                                 </Nav.Link>
                             </>
                         ) : (
-                            <Nav.Link href="/login">Login</Nav.Link>
+                            <>
+                                <Nav.Link href="/login">Login</Nav.Link>
+                                <Nav.Link className="text-light me-3">
+                                    {currentDate}
+                                </Nav.Link>
+                            </>
                         )}
                     </Nav>
                 </Navbar.Collapse>
