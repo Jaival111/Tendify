@@ -11,7 +11,6 @@ app.include_router(auth_router.router)
 app.include_router(subject_router.router)
 
 origins = [
-    "http://localhost:3000",
     "https://tendify-frontend.onrender.com",
 ]
 
