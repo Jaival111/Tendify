@@ -60,6 +60,7 @@ function SignupPage() {
             navigate('/');
         } catch (err) {
             setError(err.message);
+            localStorage.removeItem('access_token'); // Clear token on error
         }
     };
 
