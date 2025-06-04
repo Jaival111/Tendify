@@ -36,8 +36,8 @@ Live Preview: <a href="https://tendify.onrender.com">tendify.onrender.com</a>
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/attendance-manager.git
-cd attendance-manager
+git clone https://github.com/yourusername/Tendify.git
+cd Tendify
 ```
 
 2. Set up the backend:
@@ -76,7 +76,7 @@ The application will be available at:
 
 Once the backend server is running, you can access the API documentation at:
 - Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
+- ReDoc: http://localhost:3000/redoc
 
 ## Project Structure
 
