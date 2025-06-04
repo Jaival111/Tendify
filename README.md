@@ -2,6 +2,8 @@
 
 A modern web application to help students track and manage their class attendance effectively.
 
+Live Preview: <a href="https://tendify.onrender.com">tendify.onrender.com</a>
+
 ## Features
 
 - 📊 Track attendance for multiple subjects
