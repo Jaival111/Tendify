@@ -1,4 +1,4 @@
-const API_BASE_URL = 'https://tendify-backend.onrender.com/';
+const API_BASE_URL = 'https://tendify-backend.onrender.com';
 
 const getAuthHeader = () => {
     const token = localStorage.getItem('access_token');
