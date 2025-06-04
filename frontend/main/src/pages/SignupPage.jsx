@@ -28,7 +28,7 @@ function SignupPage() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/signup', {
+            const response = await fetch('https://tendify-backend.onrender.com/signup', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ function SignupPage() {
             localStorage.setItem('access_token', data.access_token);
             
             // Fetch user data after successful signup
-            const userResponse = await fetch('http://localhost:8000/me', {
+            const userResponse = await fetch('https://tendify-backend.onrender.com/me', {
                 headers: {
                     'Authorization': `Bearer ${data.access_token}`
                 }

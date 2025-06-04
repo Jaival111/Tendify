@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
         const token = localStorage.getItem('access_token');
         if (token) {
             // Fetch user data using the token
-            fetch('http://localhost:8000/me', {
+            fetch('https://tendify-backend.onrender.com/me', {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

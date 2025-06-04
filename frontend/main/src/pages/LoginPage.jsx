@@ -27,7 +27,7 @@ function LoginPage() {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:8000/login', {
+            const response = await fetch('https://tendify-backend.onrender.com/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -44,7 +44,7 @@ function LoginPage() {
             localStorage.setItem('access_token', data.access_token);
             
             // Fetch user data after successful login
-            const userResponse = await fetch('http://localhost:8000/me', {
+            const userResponse = await fetch('https://tendify-backend.onrender.com/me', {
                 headers: {
                     'Authorization': `Bearer ${data.access_token}`
                 }
